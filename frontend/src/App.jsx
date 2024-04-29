@@ -5,6 +5,9 @@ import Register from "./pages/Register"
 import Home from "./pages/Home"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
+import NavBar from "./components/NavBar"
+import './styles/index.css';
+import Hero from "./components/Hero"
 
 function Logout() {
   return <Navigate to="/login" />
@@ -18,6 +21,8 @@ function RegisterAndLogout() {
 function App() {
   return (
     <BrowserRouter>
+    <NavBar />
+    <Hero />
       <Routes>
         <Route
           path="/"
@@ -27,6 +32,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterAndLogout />} />
