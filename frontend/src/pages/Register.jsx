@@ -8,8 +8,8 @@ function Register() {
     <>
       <Navbar />
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div className="container mx-auto mt-10" style={{ flex: 1, overflow: 'auto' }}> {/* Adjust margin top according to your design */}
-          <RegisterForm />
+        <div className="container mx-auto mt-10" style={{ flex: 1, overflow: 'auto' }}>
+          <RegisterForm route="/account/register/" />
         </div>
         <Footer />
       </div>

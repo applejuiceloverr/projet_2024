@@ -9,7 +9,7 @@ function Login() {
       <Navbar />
       <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 60px)' }}>
         <div className="container mx-auto mt-10" style={{ flex: 1, overflow: 'auto' }}> {/* Adjust margin top according to your design */}
-          <LoginForm />
+        <LoginForm route="account/login/" method="login"/>
         </div>
         <Footer />
       </div>
