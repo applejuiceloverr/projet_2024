@@ -6,7 +6,17 @@ const HomeUser = () => {
 
   // Get user data from local storage
   const storedData = JSON.parse(localStorage.getItem('user'));
-  const currentUser = storedData ? storedData.user : null;
+  const [currentUser, setCurrentUser] = useState(storedData ? storedData.user : null);
+
+  useEffect(() => {
+    if (!currentUser) {
+      // If the user is not logged in, check local storage
+      const storedData = JSON.parse(localStorage.getItem('user'));
+      if (storedData && storedData.user) {
+        setCurrentUser(storedData.user);
+      }
+    }
+  }, []);
 
   if (!currentUser) {
     return <div>Loading...</div>;
