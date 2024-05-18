@@ -21,12 +21,12 @@ function CheckLogin({ children }) {
   const storedData = JSON.parse(localStorage.getItem('user'));
   const currentUser = storedData ? storedData.user : null;
 
-  if (currentUser) {
-    // If the user is logged in, redirect them to the /homeuser page
-    return <Navigate to="/homeuser" />;
+  if (!currentUser) {
+    // If the user is not logged in, redirect them to the /login page
+    return <Navigate to="/login" />;
   }
 
-  // If the user is not logged in, render the children
+  // If the user is logged in, render the children
   return children;
 }
 
@@ -36,8 +36,8 @@ function App() {
       <Routes>
         <Route path="/" element={<CheckLogin><Home /></CheckLogin>} />
         <Route path="/home" element={<CheckLogin><Home /></CheckLogin>} />
-        <Route path="/homeuser" element={<HomeUser />} />
-        <Route path="/login" element={<CheckLogin><Login /></CheckLogin>} />
+        <Route path="/homeuser" element={<CheckLogin><HomeUser /></CheckLogin>} />
+        <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<CheckLogin><RegisterAndLogout /></CheckLogin>} />
         <Route path="*" element={<NotFound />} />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import NavBar from '../components/NavBar';
 const HomeUser = () => {
   const navigate = useNavigate();
 
@@ -26,6 +26,7 @@ const HomeUser = () => {
 
   return (
     <div>
+      <NavBar />
       <h1 className="text-white">Welcome to your personal home page, {displayName}!</h1>
     </div>
   );

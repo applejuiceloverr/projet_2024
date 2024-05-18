@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
-
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [nav, setNav] = useState(false);
   const [dropdown, setDropdown] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem('user'));
+    const currentUser = storedData ? storedData.user : null;
+    setLoggedIn(currentUser ? true : false);
+  }, []);
 
   const handleNav = () => {
     setNav(!nav);
@@ -16,6 +25,17 @@ const Navbar = () => {
 
   const closeNav = () => {
     setNav(false);
+  };
+
+  const logout = async () => {
+    try {
+      await axios.post('http://127.0.0.1:8000/account/logout/');
+      localStorage.removeItem('user');
+      setLoggedIn(false);
+      navigate('/home');
+    } catch (error) {
+      console.error('Failed to logout', error);
+    }
   };
 
   return (
@@ -42,7 +62,11 @@ const Navbar = () => {
           )}
         </li>
         <li className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Contact</li>
-        <li className='p-4 hover:text-[rgb(0,223,154)] transition duration-500 ease-in-out'>Login</li>
+        {loggedIn ? (
+          <li onClick={logout} className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Logout</li>
+        ) : (
+          <li className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Login</li>
+        )}
       </ul>
       <div onClick={handleNav} className='block md:hidden'>
         {nav ? <AiOutlineClose size={20} /> : <AiOutlineMenu size={20} />}
@@ -55,14 +79,18 @@ const Navbar = () => {
           Categories
           {dropdown && (
             <ul className='absolute left-0 w-full mt-2 py-2 bg-gray-800 text-white rounded-lg shadow-xl'>
-              <li className='px-4 py-2 border-b border-gray-600 hover:bg-gray-700'>Web Development</li>
-              <li className='px-4 py-2 border-b border-gray-600 hover:bg-gray-700'>Database Management</li>
-              <li className='px-4 py-2  border-gray-600 hover:bg-gray-700'>Cloud Services</li>
+              <li className='px-4 py-2 hover:bg-gray-700'>Web Development</li>
+              <li className='px-4 py-2 hover:bg-gray-700'>Database Management</li>
+              <li className='px-4 py-2 hover:bg-gray-700'>Cloud Services</li>
             </ul>
           )}
         </li>
         <li className='p-4 border-b border-gray-600 hover:text-[#00df9a] transition duration-500 ease-in-out'>Contact</li>
-        <li className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Login</li>
+        {loggedIn ? (
+          <li onClick={logout} className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Logout</li>
+        ) : (
+          <li className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Login</li>
+        )}
       </ul>
     </div>
   );

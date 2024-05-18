@@ -4,6 +4,7 @@ from .serializers import AccountSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Account
 #from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth import get_user_model, login, logout
 
 
 class CreateAccountView(generics.CreateAPIView):
@@ -60,3 +61,10 @@ def current_user(request):
       'is_active' : user.is_active,
       'is_sub' : user.is_sub,
     })
+
+class UserLogout(APIView):
+	permission_classes = (permissions.AllowAny,)
+	authentication_classes = ()
+	def post(self, request):
+		logout(request)
+		return Response(status=status.HTTP_200_OK)
