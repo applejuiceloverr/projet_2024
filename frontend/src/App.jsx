@@ -6,6 +6,8 @@ import Home from './pages/Home';
 import HomeUser from './pages/HomeUser';
 import NotFound from './pages/NotFound';
 import './styles/index.css';
+import Subscribe from './pages/Subscribe';
+import Success from './pages/Success';
 
 function Logout() {
   return <Navigate to="/Login" />;
@@ -36,10 +38,12 @@ function App() {
       <Routes>
         <Route path="/" element={<CheckLogin><Home /></CheckLogin>} />
         <Route path="/home" element={<CheckLogin><Home /></CheckLogin>} />
+        <Route path="/Subscribe" element={<Subscribe />} />
         <Route path="/homeuser" element={<CheckLogin><HomeUser /></CheckLogin>} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/register" element={<CheckLogin><RegisterAndLogout /></CheckLogin>} />
+        <Route path="/success" element={<Success />} />
+        <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

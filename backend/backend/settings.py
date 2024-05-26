@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'Account',
+    'subscriptions',
     
 ]
 
@@ -169,4 +170,31 @@ CORS_ORIGIN_WHITELIST = [
 ]
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+]
+
+
+STRIPE_SECRET_KEY = 'sk_test_51PHsKYP0XWDMwWc8ItumDkqzWOBmgJ7M6oHAB1MqQUE6QAvqA4gvEPGGsOablgnLNyxEbIA48YXqJMkfquCO7Lgp00nLXYcUVB'
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51PHsKYP0XWDMwWc8ZioPGlh5YRVdB8097sALB62Z42jz7pI7i2DZcmJjfJTOOT8cYER3qT6jbN5A7JnfKP1LjUjN00cqXC3q6J'
+
+STRIPE_PRICE_ID_MONTHLY = 'price_1PHt2JP0XWDMwWc8y4ykVmNv'  
+STRIPE_PRICE_ID_SEMIANNUAL = 'price_1PHt2JP0XWDMwWc8XxrQXYYp'
+STRIPE_PRICE_ID_ANNUAL = 'price_1PHt2JP0XWDMwWc80VEUuy89'
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
 ]

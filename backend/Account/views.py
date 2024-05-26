@@ -3,16 +3,8 @@ from rest_framework import generics
 from .serializers import AccountSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Account
-#from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model, login, logout
-
-
-class CreateAccountView(generics.CreateAPIView):
-    queryset = Account.objects.all()
-    serializer_class = AccountSerializer
-    permission_classes = [AllowAny]
-
-
+import stripe
 from django.contrib.auth import login
 from rest_framework import permissions, status
 from rest_framework.authentication import SessionAuthentication
@@ -21,6 +13,22 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserLoginSerializer
 from .serializers import UserLoginSerializer, AccountSerializer
+
+class CreateAccountView(generics.CreateAPIView):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+    permission_classes = [AllowAny]
+
+    def perform_create(self, serializer):
+        user = serializer.save()  # Save the user first, so we have an ID we can associate with the Stripe customer
+        stripe.api_key = "sk_test_51PHsKYP0XWDMwWc8ItumDkqzWOBmgJ7M6oHAB1MqQUE6QAvqA4gvEPGGsOablgnLNyxEbIA48YXqJMkfquCO7Lgp00nLXYcUVB"
+        customer = stripe.Customer.create(email=user.email)
+
+        user.stripe_customer_id = customer.id
+        user.save()
+
+
+
 
 class LoginView(APIView):
     permission_classes = (permissions.AllowAny,)

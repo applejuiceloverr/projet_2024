@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin 
 from django.utils.crypto import get_random_string   
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 class MyAccountManager(BaseUserManager):
     def create_user(self, email, nom, prenom, password=None):
         if not email:
@@ -46,10 +47,13 @@ class Account(AbstractBaseUser, PermissionsMixin):
     nom = models.CharField(max_length=30)
     prenom = models.CharField(max_length=30)
     is_sub = models.BooleanField(default=False)
+    stripe_customer_id = models.CharField(max_length=50, blank=True, null=True)
+    
     def save(self, *args, **kwargs):
         if not self.username:
             self.username = self.email
         super().save(*args, **kwargs)
+
 
 
     groups = models.ManyToManyField(
@@ -82,3 +86,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return True
+
+@receiver(post_save, sender=Account)
+def update_is_sub(sender, instance, created, **kwargs):
+    if created and instance.stripe_customer_id:
+        instance.is_sub = True
+        instance.save()
