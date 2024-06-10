@@ -1,5 +1,5 @@
 # subscriptions/views.py
-
+from stripe.error import InvalidRequestError
 from django.conf import settings
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
@@ -14,7 +14,7 @@ import os
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from .serializers import CreateCheckoutSessionSerializer
-
+from time import sleep
 
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 stripe_webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
@@ -23,6 +23,20 @@ from .serializers import CreateCheckoutSessionSerializer
 
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
+
+from django.contrib.auth import get_user_model
+from time import sleep
+
+User = get_user_model()
+
+def get_user_with_retry(stripe_customer_id, retries=5, delay=2):
+    for _ in range(retries):
+        try:
+            return User.objects.get(stripe_customer_id=stripe_customer_id)
+        except User.DoesNotExist:
+            sleep(delay)
+    print(f"No user found with stripe_customer_id {stripe_customer_id}")
+    return None
 
 @csrf_exempt
 @api_view(['POST'])
@@ -67,12 +81,6 @@ def create_checkout_session(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
 
-
-
-
-stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
-stripe_webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
-
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
@@ -89,33 +97,39 @@ def stripe_webhook(request):
         # Invalid signature
         return JsonResponse({'error': str(e)}, status=400)
 
-    # Handle the event
+    User = get_user_model()
+
     if event['type'] == 'invoice.payment_succeeded':
-        # Retrieve the customer ID from the event
         customer_id = event['data']['object']['customer']
         print(f"Received payment success event for customer {customer_id}")
-        # Update the user's is_sub field to True
-        User = get_user_model()
-        try:
-            user = User.objects.get(stripe_customer_id=customer_id)
+        user = get_user_with_retry(customer_id)
+        if user:
             user.is_sub = True
             user.save()
             print(f"Updated is_sub for user {user.id}")
-        except User.DoesNotExist:
-            print(f"No user found with stripe_customer_id {customer_id}")
-    elif event['type'] == 'customer.subscription.deleted':
-        # Retrieve the customer ID from the event
-        customer_id = event['data']['object']['customer']
-        print(f"Received subscription cancellation event for customer {customer_id}")
-        # Update the user's is_sub field to False
-        User = get_user_model()
-        try:
-            user = User.objects.get(stripe_customer_id=customer_id)
-            user.is_sub = False
+
+    elif event['type'] == 'customer.subscription.updated':
+        subscription = event['data']['object']
+        customer_id = subscription['customer']
+        status = subscription['status']
+        print(f"Received subscription updated event for customer {customer_id} with status {status}")
+        user = get_user_with_retry(customer_id)
+        if user:
+            user.is_sub = status == 'active'
             user.save()
-            print(f"Updated is_sub for user {user.id}")
+            print(f"Updated is_sub for user {user.id} to {user.is_sub}")
+
+    elif event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        customer_id = session['customer']
+        email = session['customer_details']['email']  # Assuming the customer's email is available
+
+        try:
+            user = User.objects.get(email=email)  # Fetch the user with the given email
+            user.stripe_customer_id = customer_id  # Update the stripe_customer_id
+            user.save()
+            print(f"Updated stripe_customer_id for user {user.id}")
         except User.DoesNotExist:
-            print(f"No user found with stripe_customer_id {customer_id}")
+            print(f"No user found with email {email}")
 
     return JsonResponse({'success': True})
-
