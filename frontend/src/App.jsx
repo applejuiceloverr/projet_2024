@@ -17,37 +17,44 @@ function RegisterAndLogout() {
   localStorage.clear();
   return <Register />;
 }
+function CheckNotLogin({ children }) {
+  const storedData = JSON.parse(localStorage.getItem('user'));
+  const currentUser = storedData ? storedData.user : null;
 
-// New component that checks if the user is logged in
+  if (currentUser) {
+    return <Navigate to="/homeuser" />;
+  }
+
+  return children;
+}
+
 function CheckLogin({ children }) {
   const storedData = JSON.parse(localStorage.getItem('user'));
   const currentUser = storedData ? storedData.user : null;
 
   if (!currentUser) {
-    // If the user is not logged in, redirect them to the /login page
     return <Navigate to="/login" />;
   }
 
-  // If the user is logged in, render the children
-  return children;
+  return React.cloneElement(children, { currentUser });
 }
-
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<CheckLogin><Home /></CheckLogin>} />
-        <Route path="/home" element={<CheckLogin><Home /></CheckLogin>} />
+        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/Subscribe" element={<Subscribe />} />
         <Route path="/homeuser" element={<CheckLogin><HomeUser /></CheckLogin>} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<CheckNotLogin><Login /></CheckNotLogin>} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/success" element={<Success />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<CheckNotLogin><Register /></CheckNotLogin>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
 }
+
 
 export default App;

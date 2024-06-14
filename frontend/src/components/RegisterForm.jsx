@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from "../api";
+import { useNavigate } from 'react-router-dom';
 
 function RegisterForm({route}) {
   const [firstName, setFirstName] = useState('');
@@ -7,6 +8,7 @@ function RegisterForm({route}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -26,6 +28,7 @@ function RegisterForm({route}) {
       });
   
       console.log(response.data);
+      navigate('/login');
     } catch (error) {
       console.error(error);
     }
