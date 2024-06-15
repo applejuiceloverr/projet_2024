@@ -2,23 +2,30 @@
 import React from 'react';
 import { DiOnedrive, DiLinux, DiHtml5, DiCodeBadge, DiDatabase } from "react-icons/di";
 import { AiFillGithub, AiOutlineArrowRight } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 const categories = [
-    { name: 'Cloud', icon: <DiOnedrive />, link: '/onedrive' },
-    { name: 'Linux', icon: <DiLinux />, link: '/linux' },
-    { name: 'Web Dev', icon: <DiHtml5 />, link: '/html5' },
-    { name: 'Coding', icon: <DiCodeBadge />, link: '/coding' },
-    { name: 'Database', icon: <DiDatabase />, link: '/database' },
-    { name: 'Devops', icon: <AiFillGithub />, link: '/github' },
+    { id: 6, name: 'Cloud', icon: <DiOnedrive /> },
+    { id: 2, name: 'Linux', icon: <DiLinux /> },
+    { id: 3, name: 'Web Dev', icon: <DiHtml5 /> },
+    { id: 4, name: 'Coding', icon: <DiCodeBadge /> },
+    { id: 5, name: 'Database', icon: <DiDatabase /> },
+    { id: 1, name: 'Devops', icon: <AiFillGithub /> },
 ];
 
-const CategoryCard = ({ name, icon, link }) => {
+const CategoryCard = ({ id, name, icon }) => {
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate(`/categories/${id}`);
+    };
+
     return (
-        <a href={link} className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center hover:bg-black transition duration-300 group">
+        <div onClick={handleClick} className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center hover:bg-black transition duration-300 group cursor-pointer">
             <div className="text-4xl text-black mb-4 group-hover:text-white">{icon}</div>
             <h2 className="text-xl font-bold mb-2 text-black group-hover:text-white">{name}</h2>
             <AiOutlineArrowRight className="text-[#00df9a] group-hover:text-white" />
-        </a>
+        </div>
     );
 };
 

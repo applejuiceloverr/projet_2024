@@ -8,6 +8,7 @@ import NotFound from './pages/NotFound';
 import './styles/index.css';
 import Subscribe from './pages/Subscribe';
 import Success from './pages/Success';
+import CategoryCourses from './pages/CategoryCourses'; // import CategoryCourses
 
 function Logout() {
   return <Navigate to="/Login" />;
@@ -50,6 +51,7 @@ function App() {
         <Route path="/logout" element={<Logout />} />
         <Route path="/success" element={<Success />} />
         <Route path="/register" element={<CheckNotLogin><Register /></CheckNotLogin>} />
+        <Route path="/categories/:categoryId" element={<CategoryCourses />} /> {/* add this line */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
