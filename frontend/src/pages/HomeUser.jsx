@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
+import Footer from '../components/Footeer';
 const HomeUser = () => {
   const navigate = useNavigate();
 
@@ -28,7 +29,9 @@ const HomeUser = () => {
     <div>
       <NavBar />
       <h1 className="text-white">Welcome to your personal home page, {displayName}!</h1>
+      <Footer />
     </div>
+    
   );
 };
 

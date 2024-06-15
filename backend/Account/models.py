@@ -1,10 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin 
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.crypto import get_random_string   
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
 class MyAccountManager(BaseUserManager):
-    def create_user(self, email, nom, prenom, password=None):
+    def create_user(self, email, username=None, nom=None, prenom=None, password=None, **extra_fields):
         if not email:
             raise ValueError("Users must have an email address.")
         if not nom:
@@ -12,29 +13,32 @@ class MyAccountManager(BaseUserManager):
         if not prenom:
             raise ValueError("Users must have a first name.")
         
+        email = self.normalize_email(email)
         user = self.model(
-               email=self.normalize_email(email),
-               nom=nom,
-               prenom=prenom,
-               username=self.normalize_email(email),  # Set username to email
+            email=email,
+            nom=nom,
+            prenom=prenom,
+            username=username or email,  # Set username to email if not provided
+            **extra_fields
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
     
-    def create_superuser(self, email, nom, prenom,  password=None):
-        user = self.create_user(
-               email=self.normalize_email(email),
-               nom=nom,
-               prenom=prenom,
-               password=password,
-               username=self.normalize_email(email),  # Set username to email
+    def create_superuser(self, email, nom, prenom, password=None, **extra_fields):
+        extra_fields.setdefault('is_admin', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_sub', True)
+
+        return self.create_user(
+            email=email,
+            nom=nom,
+            prenom=prenom,
+            password=password,
+            **extra_fields
         )
-        user.is_admin = True
-        user.is_superuser = True
-        user.is_sub = True
-        user.save(using=self._db)
-        return user
+
 def get_unique_username():
     return get_random_string(length=32)
 
@@ -44,6 +48,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(verbose_name="date joined", auto_now_add=True)
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)  # Add is_staff field
     nom = models.CharField(max_length=30)
     prenom = models.CharField(max_length=30)
     is_sub = models.BooleanField(default=False)
@@ -53,8 +58,6 @@ class Account(AbstractBaseUser, PermissionsMixin):
         if not self.username:
             self.username = self.email
         super().save(*args, **kwargs)
-
-
 
     groups = models.ManyToManyField(
         'auth.Group',
@@ -74,15 +77,13 @@ class Account(AbstractBaseUser, PermissionsMixin):
     objects = MyAccountManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['nom', 'prenom']
+    REQUIRED_FIELDS = ['email', 'nom', 'prenom']
 
     def __str__(self):
         return f"{self.email}, {self.nom}, {self.prenom}"
 
     def has_perm(self, perm, obj=None):
-        if self.is_superuser:
-            return True
-        return self.is_admin
+        return self.is_superuser or self.is_admin
 
     def has_module_perms(self, app_label):
         return True
