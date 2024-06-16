@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Footer from '../components/Footeer';
+import NavBar from '../components/NavBar';
 
 const CategoryCourses = () => {
     const { categoryId } = useParams();
@@ -30,17 +32,30 @@ const CategoryCourses = () => {
     }, [categoryId]);
 
     return (
-        <div>
-            {Array.isArray(courses) ? (
-                courses.map(course => (
-                    <div key={course.id}>
-                        <h2>{course.title}</h2>
-                        <p>{course.description}</p>
-                    </div>
-                ))
-            ) : (
-                <p>No courses found.</p>
-            )}
+        <div className="">
+            <NavBar />
+            <div className="flex-grow container mx-auto sm:px-6 lg:px-8 py-12">
+                <h1 className="text-4xl font-extrabold mb-12 text-center text-[#00df9a]">Courses</h1>
+                <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {Array.isArray(courses) ? (
+                        courses.map(course => (
+                            <div key={course.id} className="bg-[#282A35] border border-gray-400 shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                                <div className="w-full h-48 overflow-hidden">
+                                    <img src={course.image} alt={course.title} className="w-full h-full object-cover"/>
+                                </div>
+                                <div className="p-6">
+                                    <h2 className="text-2xl font-bold mb-2 text-white">{course.title}</h2>
+                                    <p className="text-gray-400 mb-4">{course.description}</p>
+                                    <button className="bg-[#00df9a] text-white px-4 py-2 rounded hover:bg-[#00b87a] transition duration-200">Learn More</button>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center text-gray-700 col-span-full">No courses found.</p>
+                    )}
+                </div>
+            </div>
+            <Footer />
         </div>
     );
 };

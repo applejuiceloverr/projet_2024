@@ -29,5 +29,5 @@ class CoursesByCategoryView(APIView):
     def get(self, request, category_id):
         category = get_object_or_404(Category, id=category_id)
         courses = Course.objects.filter(category=category)
-        serializer = CourseSerializer(courses, many=True)
+        serializer = CourseSerializer(courses, many=True, context={'request': request})
         return Response(serializer.data)

@@ -17,7 +17,8 @@ class Course(models.Model):
     title = models.CharField(max_length=255)
     difficulty = models.CharField(max_length=20, choices=DIFFICULTY_LEVELS)
     category = models.ForeignKey(Category, related_name='courses', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)  # Add this line to define the created_at field
+    created_at = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='courses/')  # Add this line to define the image field
 
     def __str__(self):
         return self.title

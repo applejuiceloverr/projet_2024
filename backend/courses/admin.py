@@ -8,7 +8,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ( 'title', 'description', 'category', 'created_at')
-    search_fields = ( 'title', 'description')
+    list_display = ('title', 'description', 'category', 'image', 'created_at')
+    search_fields = ('title', 'description')
     list_filter = ('category', 'created_at')
     ordering = ('created_at',)
