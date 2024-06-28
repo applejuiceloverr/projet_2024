@@ -23,7 +23,7 @@ function RegisterForm({route}) {
         nom: firstName,
         prenom: lastName,
         email,
-        username: email, // Add this line
+        username: email, 
         password,
       });
   

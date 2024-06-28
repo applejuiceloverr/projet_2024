@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserLoginSerializer
 from .serializers import UserLoginSerializer, AccountSerializer
-
+from rest_framework import permissions
 class CreateAccountView(generics.CreateAPIView):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
@@ -76,3 +76,28 @@ class UserLogout(APIView):
 	def post(self, request):
 		logout(request)
 		return Response(status=status.HTTP_200_OK)
+
+
+
+
+class IsAdminOrReadOnly(permissions.BasePermission):
+    """
+    Custom permission to only allow admins to edit objects.
+    """
+
+    def has_permission(self, request, view):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD, or OPTIONS requests.
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # Write permissions are only allowed to the admin user.
+        return request.user and request.user.is_authenticated and (request.user.is_admin or request.user.is_superuser)
+
+class IsAdminUser(permissions.BasePermission):
+    """
+    Custom permission to only allow admin users to access.
+    """
+    def has_permission(self, request, view):
+        return request.user and request.user.is_authenticated and (request.user.is_admin or request.user.is_superuser)
+

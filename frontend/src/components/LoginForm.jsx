@@ -56,7 +56,7 @@ const LoginForm = () => {
       })
     })
     .then(response => {
-      if (response.ok) { // Check if the status code is 200-299
+      if (response.ok) { 
         return response.json();
       } else {
         throw new Error('Failed to login');

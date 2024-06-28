@@ -23,7 +23,7 @@ function Home() {
       <Editor />
       <Cards />
       <Footer />
-      {/* Rest of the Home component */}
+     
     </div>
   );
 }
