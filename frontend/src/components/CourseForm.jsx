@@ -12,6 +12,7 @@ const CourseForm = () => {
     difficulty: '',
     pdf: null,
     image: null,
+    quizFile: null, // Add field for the Excel file
   });
   const navigate = useNavigate();
 
@@ -166,6 +167,18 @@ const CourseForm = () => {
         id="image"
         name="image"
         accept="image/*"
+        onChange={handleChange}
+        className="border border-gray-300 rounded-md p-2 w-full mb-4"
+      />
+
+      <label htmlFor="quizFile" className="block font-medium text-gray-700 mb-2">
+        Quiz File (Excel):
+      </label>
+      <input
+        type="file"
+        id="quizFile"
+        name="quizFile"
+        accept=".xlsx, .xls"
         onChange={handleChange}
         className="border border-gray-300 rounded-md p-2 w-full mb-4"
       />

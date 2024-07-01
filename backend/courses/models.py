@@ -34,20 +34,15 @@ class Quiz(models.Model):
     def __str__(self):
         return f"{self.course.title} Quiz"
 
-class Question(models.Model):
-    quiz = models.ForeignKey(Quiz, related_name='questions', on_delete=models.CASCADE)
-    text = models.TextField()
+class Element(models.Model):
+    quiz = models.ForeignKey(Quiz, related_name='elements', on_delete=models.CASCADE)
+    question = models.TextField()
+    response = models.CharField(max_length=255)
+    option1 = models.CharField(max_length=255)
+    option2 = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.text
-
-class Option(models.Model):
-    question = models.ForeignKey(Question, related_name='options', on_delete=models.CASCADE)
-    text = models.CharField(max_length=255)
-    is_correct = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.text
+        return f"Question for {self.quiz.title}: {self.question}"
 
 class Certification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='certifications', on_delete=models.CASCADE)

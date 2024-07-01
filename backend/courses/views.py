@@ -1,4 +1,4 @@
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, status
 from rest_framework.decorators import permission_classes, parser_classes, api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -8,9 +8,11 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from .models import Course, Category, Quiz, Question, Option
-from .serializers import CourseSerializer, CategorySerializer, QuizSerializer, QuestionSerializer, OptionSerializer
+from .models import Course, Category, Quiz, Element
+from .serializers import CourseSerializer, CategorySerializer, QuizSerializer, ElementSerializer
 from django.contrib.auth import get_user_model
+import pandas as pd
+import io
 
 User = get_user_model()
 
@@ -23,14 +25,38 @@ class CourseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user_id = self.request.data.get('created_by')
         user = get_object_or_404(User, id=user_id)
-        serializer.save(created_by=user)
+        course = serializer.save(created_by=user)
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        category_id = self.request.query_params.get('category_id')
-        if category_id:
-            queryset = queryset.filter(category_id=category_id)
-        return queryset
+        quiz_file = self.request.FILES.get('quizFile')
+        if quiz_file:
+            try:
+                self.process_quiz_file(quiz_file, course)
+            except Exception as e:
+                print(f"Error processing quiz file: {e}")
+                course.delete()  # Rollback course creation if quiz processing fails
+                raise ValueError(f"Error creating course: {e}")
+
+    def process_quiz_file(self, quiz_file, course):
+        try:
+            df = pd.read_excel(quiz_file)
+            required_columns = ['question', 'response', 'option1', 'option2']
+            if not all(column in df.columns for column in required_columns):
+                raise ValueError(f"Excel file is missing one of the required columns: {required_columns}")
+            
+            quiz = Quiz.objects.create(course=course, title=f"{course.title} Quiz")
+            
+            for index, row in df.iterrows():
+                Element.objects.create(
+                    quiz=quiz,
+                    question=row['question'],
+                    response=row['response'],
+                    option1=row['option1'],
+                    option2=row['option2']
+                )
+                
+        except Exception as e:
+            print(f"Error processing quiz file: {e}")
+            raise ValueError(f"Error processing quiz file: {e}")
 
 @permission_classes([AllowAny])
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -65,7 +91,38 @@ class CourseListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         user_id = self.request.data.get('created_by')
         user = get_object_or_404(User, id=user_id)
-        serializer.save(created_by=user)
+        course = serializer.save(created_by=user)
+
+        quiz_file = self.request.FILES.get('quizFile')
+        if quiz_file:
+            try:
+                self.process_quiz_file(quiz_file, course)
+            except Exception as e:
+                print(f"Error processing quiz file: {e}")
+                course.delete()  # Rollback course creation if quiz processing fails
+                raise ValueError(f"Error creating course: {e}")
+
+    def process_quiz_file(self, quiz_file, course):
+        try:
+            df = pd.read_excel(quiz_file)
+            required_columns = ['question', 'response', 'option1', 'option2']
+            if not all(column in df.columns for column in required_columns):
+                raise ValueError(f"Excel file is missing one of the required columns: {required_columns}")
+            
+            quiz = Quiz.objects.create(course=course, title=f"{course.title} Quiz")
+            
+            for index, row in df.iterrows():
+                Element.objects.create(
+                    quiz=quiz,
+                    question=row['question'],
+                    response=row['response'],
+                    option1=row['option1'],
+                    option2=row['option2']
+                )
+                
+        except Exception as e:
+            print(f"Error processing quiz file: {e}")
+            raise ValueError(f"Error processing quiz file: {e}")
 
 @method_decorator(csrf_exempt, name='dispatch')
 @permission_classes([AllowAny])
@@ -73,19 +130,6 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     parser_classes = [MultiPartParser, FormParser]
-
-
-class QuizViewSet(viewsets.ModelViewSet):
-    queryset = Quiz.objects.all()
-    serializer_class = QuizSerializer
-
-class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
-
-class OptionViewSet(viewsets.ModelViewSet):
-    queryset = Option.objects.all()
-    serializer_class = OptionSerializer
 
 @permission_classes([AllowAny])
 class CoursesByTeacherView(APIView):
@@ -95,3 +139,45 @@ class CoursesByTeacherView(APIView):
         serializer = CourseSerializer(courses, many=True, context={'request': request})
         return Response(serializer.data)
 
+@permission_classes([AllowAny])
+class QuizViewSet(viewsets.ModelViewSet):
+    queryset = Quiz.objects.all()
+    serializer_class = QuizSerializer
+
+@permission_classes([AllowAny])
+class ElementViewSet(viewsets.ModelViewSet):
+    queryset = Element.objects.all()
+    serializer_class = ElementSerializer
+
+@permission_classes([AllowAny])
+class UploadQuizView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
+        file = request.FILES.get('file')
+        
+        if not file:
+            return Response({"error": "No file uploaded."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            df = pd.read_excel(file)
+            required_columns = ['question', 'response', 'option1', 'option2']
+            if not all(column in df.columns for column in required_columns):
+                raise ValueError(f"Excel file is missing one of the required columns: {required_columns}")
+
+            quiz = Quiz.objects.create(course=course, title=f"{course.title} Quiz")
+            
+            for index, row in df.iterrows():
+                Element.objects.create(
+                    quiz=quiz,
+                    question=row['question'],
+                    response=row['response'],
+                    option1=row['option1'],
+                    option2=row['option2']
+                )
+            
+            return Response({"success": "Quiz created successfully."}, status=status.HTTP_201_CREATED)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
