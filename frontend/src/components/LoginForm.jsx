@@ -13,12 +13,12 @@ const LoginForm = () => {
   useEffect(() => {
     // Check if the user is already logged in
     axios.get("/account/")
-    .then(function(res) {
-      setCurrentUser(true);
-    })
-    .catch(function(error) {
-      setCurrentUser(false);
-    });
+      .then(function (res) {
+        setCurrentUser(true);
+      })
+      .catch(function (error) {
+        setCurrentUser(false);
+      });
   }, []);
 
   function getCsrfToken() {
@@ -37,13 +37,13 @@ const LoginForm = () => {
     console.log(csrfToken); // Log the CSRF token to the console
     return csrfToken;
   }
-  
+
   const submitLogin = (e) => {
     e.preventDefault();
-  
+
     const csrfToken = getCsrfToken();
     console.log(csrfToken);
-  
+
     fetch('http://127.0.0.1:8000/account/login/', {
       method: 'POST',
       headers: {
@@ -55,25 +55,31 @@ const LoginForm = () => {
         password: password
       })
     })
-    .then(response => {
-      if (response.ok) { 
-        return response.json();
-      } else {
-        throw new Error('Failed to login');
-      }
-    })
-    .then(data => {
-      console.log('User data from server:', data);
-  
-      // Store the user data in local storage
-      localStorage.setItem('user', JSON.stringify(data));
-  
-      navigate('/homeuser'); // Redirect to /homeuser
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Failed to login');
+        }
+      })
+      .then(data => {
+        console.log('User data from server:', data);
+
+        // Store the user data in local storage
+        localStorage.setItem('user', JSON.stringify(data));
+
+        // Redirect based on is_staff
+        if (data.user.is_staff) {
+          navigate('/teacher'); // Redirect to /teacherhome
+        } else {
+          navigate('/homeuser'); // Redirect to /homeuser
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
   }
+
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-center mb-6">Login</h2>

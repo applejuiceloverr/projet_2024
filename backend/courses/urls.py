@@ -1,6 +1,12 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CourseViewSet, CategoryViewSet, CoursesByCategoryView, CategoryListCreateView, CategoryDetailView, CourseListCreateView, CourseDetailView, QuizViewSet, QuestionViewSet, OptionViewSet
+from .views import (
+    CourseViewSet, CategoryViewSet, CoursesByCategoryView, 
+    CategoryListCreateView, CategoryDetailView, 
+    CourseListCreateView, CourseDetailView, 
+    QuizViewSet, QuestionViewSet, OptionViewSet, 
+    CoursesByTeacherView
+)
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -18,4 +24,5 @@ urlpatterns = [
     path('categories/<int:pk>/', CategoryDetailView.as_view(), name='category-detail'),
     path('courses/list/', CourseListCreateView.as_view(), name='course-list-create'),
     path('courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),
+    path('courses/teacher/<int:teacher_id>/', CoursesByTeacherView.as_view(), name='courses-by-teacher'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

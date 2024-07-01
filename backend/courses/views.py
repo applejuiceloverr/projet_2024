@@ -1,19 +1,29 @@
-from rest_framework import generics, viewsets, status
+from rest_framework import generics, viewsets
+from rest_framework.decorators import permission_classes, parser_classes, api_view
+from rest_framework.permissions import AllowAny
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import permission_classes, parser_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from .models import Course, Category, Quiz, Question, Option
 from .serializers import CourseSerializer, CategorySerializer, QuizSerializer, QuestionSerializer, OptionSerializer
-from Account.views import IsAdminOrReadOnly, IsAdminUser
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
+
+@permission_classes([AllowAny])
 class CourseViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowAny]
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
     parser_classes = [MultiPartParser, FormParser]
+
+    def perform_create(self, serializer):
+        user_id = self.request.data.get('created_by')
+        user = get_object_or_404(User, id=user_id)
+        serializer.save(created_by=user)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -35,54 +45,53 @@ class CoursesByCategoryView(APIView):
         serializer = CourseSerializer(courses, many=True, context={'request': request})
         return Response(serializer.data)
 
+@permission_classes([AllowAny])
 class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAdminOrReadOnly]
 
+@permission_classes([AllowAny])
 class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAdminOrReadOnly]
 
+@method_decorator(csrf_exempt, name='dispatch')
+@permission_classes([AllowAny])
 class CourseListCreateView(generics.ListCreateAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsAdminOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    def perform_create(self, serializer):
+        user_id = self.request.data.get('created_by')
+        user = get_object_or_404(User, id=user_id)
+        serializer.save(created_by=user)
 
+@method_decorator(csrf_exempt, name='dispatch')
+@permission_classes([AllowAny])
 class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsAdminOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
-
-    def update(self, request, *args, **kwargs):
-        course = self.get_object()
-        serializer = self.get_serializer(course, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
 
 
 class QuizViewSet(viewsets.ModelViewSet):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
-    permission_classes = [IsAdminOrReadOnly]
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
-    permission_classes = [IsAdminOrReadOnly]
 
 class OptionViewSet(viewsets.ModelViewSet):
     queryset = Option.objects.all()
     serializer_class = OptionSerializer
-    permission_classes = [IsAdminOrReadOnly]
+
+@permission_classes([AllowAny])
+class CoursesByTeacherView(APIView):
+    def get(self, request, teacher_id):
+        teacher = get_object_or_404(User, id=teacher_id)
+        courses = Course.objects.filter(created_by=teacher)
+        serializer = CourseSerializer(courses, many=True, context={'request': request})
+        return Response(serializer.data)
+

@@ -15,10 +15,12 @@ class CourseSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False, allow_null=True)
     video = serializers.FileField(required=False, allow_null=True)
     pdf = serializers.FileField(required=False, allow_null=True)
+    created_by = serializers.PrimaryKeyRelatedField(read_only=True)
+    difficulty = serializers.ChoiceField(choices=Course.DIFFICULTY_LEVELS)
 
     class Meta:
         model = Course
-        fields = ['id', 'description', 'title', 'difficulty', 'category', 'category_detail', 'image', 'video', 'pdf']
+        fields = ['id', 'description', 'title', 'difficulty', 'category', 'category_detail', 'image', 'video', 'pdf','created_by','difficulty']
 
 class OptionSerializer(serializers.ModelSerializer):
     class Meta:

@@ -20,8 +20,9 @@ class Course(models.Model):
     category = models.ForeignKey(Category, related_name='courses', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to='courses/', blank=True, null=True)
-    video = models.FileField(upload_to='course_videos/')
-    pdf = models.FileField(upload_to='course_pdfs/')
+    video = models.FileField(upload_to='course_videos/', blank=True, null=True)
+    pdf = models.FileField(upload_to='course_pdfs/', blank=True, null=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='created_courses', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.title

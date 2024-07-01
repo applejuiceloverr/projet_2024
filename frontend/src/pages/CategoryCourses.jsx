@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import Footer from '../components/Footeer';
-import NavBar from '../components/NavBar';
+import { useParams, Link } from 'react-router-dom';
+import Footer from '../components/Footeer'; // Ensure this path is correct
+import NavBar from '../components/NavBar'; // Ensure this path is correct
 
 const CategoryCourses = () => {
     const { categoryId } = useParams();
@@ -46,7 +46,9 @@ const CategoryCourses = () => {
                                 <div className="p-6">
                                     <h2 className="text-2xl font-bold mb-2 text-white">{course.title}</h2>
                                     <p className="text-gray-400 mb-4">{course.description}</p>
-                                    <button className="bg-[#00df9a] text-white px-4 py-2 rounded hover:bg-[#00b87a] transition duration-200">Learn More</button>
+                                    <Link to={`/detail/${course.id}`}>
+                                        <button className="bg-[#00df9a] text-white px-4 py-2 rounded hover:bg-[#00b87a] transition duration-200">Learn More</button>
+                                    </Link>
                                 </div>
                             </div>
                         ))
