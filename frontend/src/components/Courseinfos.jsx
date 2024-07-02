@@ -1,9 +1,11 @@
+// Courseinfos.jsx
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const Courseinfos = () => {
     const { courseId } = useParams();
     const [course, setCourse] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetch(`http://127.0.0.1:8000/courses/courses/${courseId}/`)
@@ -23,6 +25,39 @@ const Courseinfos = () => {
                 console.error('There was a problem with the fetch operation: ', error);
             });
     }, [courseId]);
+
+    const handleStartNow = () => {
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+            console.error('User not found in local storage');
+            return;
+        }
+
+        const userId = JSON.parse(userData).user.id;
+        fetch(`http://127.0.0.1:8000/courses/courses/${courseId}/start-course/`, {  // Include courseId in the URL
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            },
+            body: JSON.stringify({ user: userId })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error(`Response status: ${response.status}, body: ${text}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            navigate(`/FirstStep/${courseId}`); // Redirect to /FirstStep/{courseId}
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation: ', error);
+        });
+    };
 
     if (!course) return <p className="text-center text-gray-700">Loading...</p>;
 
@@ -47,7 +82,12 @@ const Courseinfos = () => {
                         <strong>Difficulty:</strong> {course.difficulty}
                     </p>
                     <div className="mt-8">
-                        <a href="#" className="bg-gray-900 text-gray-100 px-5 py-3 font-semibold rounded hover:bg-gray-700 transition duration-300">Start Now</a>
+                        <button
+                            onClick={handleStartNow}
+                            className="bg-gray-900 text-gray-100 px-5 py-3 font-semibold rounded hover:bg-gray-700 transition duration-300"
+                        >
+                            Start Now
+                        </button>
                     </div>
                 </div>
             </div>

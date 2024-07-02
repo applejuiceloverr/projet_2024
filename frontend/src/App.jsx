@@ -15,7 +15,10 @@ import Teacherhome from './pages/Teacherhome';
 import ManageCourses from './pages/ManageCourses';
 import ManageStudents from './pages/ManageStudents';
 import NewCourse from './pages/NewCourse';
-
+import FirstStep from './pages/FirstStep';
+import SecondStep from './pages/SecondStep';
+import LastStep from './pages/LastStep';
+import Congratulations from './pages/congratulations';
 function Logout() {
   return <Navigate to="/Login" />;
 }
@@ -66,7 +69,12 @@ function App() {
         <Route path="/CourseManager" element={<ManageCourses />} />
         <Route path="/StudentManager" element={<ManageStudents />} />
         <Route path="/NewCourse" element={<NewCourse />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="/FirstStep/:courseId" element={<FirstStep />} />
+        <Route path="/SecondStep/:courseId" element={<SecondStep />} />
+        <Route path="/LastStep/:courseId" element={<LastStep />} />
+        <Route path="/NewCourse" element={<NewCourse />} />
+        <Route path="/congratulations/:courseId" element={<Congratulations />} />
+                <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

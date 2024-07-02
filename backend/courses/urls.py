@@ -5,12 +5,10 @@ from .views import (
     CategoryListCreateView, CategoryDetailView, 
     CourseListCreateView, CourseDetailView, 
     QuizViewSet, ElementViewSet, UploadQuizView,
-    CoursesByTeacherView
+    CoursesByTeacherView, start_course, complete_course, QuizDetailView,submit_quiz, generate_certificate
 )
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet)
@@ -27,4 +25,9 @@ urlpatterns = [
     path('courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),
     path('courses/teacher/<int:teacher_id>/', CoursesByTeacherView.as_view(), name='courses-by-teacher'),
     path('courses/<int:course_id>/upload-quiz/', UploadQuizView.as_view(), name='upload-quiz'),
+    path('courses/<int:course_id>/start-course/', start_course, name='start-course'),
+    path('courses/<int:course_id>/complete-course/', complete_course, name='complete-course'),
+    path('courses/<int:course_id>/quiz/', QuizDetailView.as_view(), name='quiz-detail'),  # Add this line
+    path('courses/<int:course_id>/submit-quiz/', submit_quiz, name='submit-quiz'),  # Add this line
+    path('courses/<int:course_id>/generate-certificate/', generate_certificate, name='generate-certificate'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

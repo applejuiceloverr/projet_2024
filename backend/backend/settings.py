@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'Account',
     'subscriptions',
     'courses',
+    'chatbot',
     
 ]
 
