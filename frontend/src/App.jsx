@@ -39,6 +39,7 @@ function CheckNotLogin({ children }) {
   return children;
 }
 
+
 function CheckLogin({ children }) {
   const storedData = JSON.parse(localStorage.getItem('user'));
   const currentUser = storedData ? storedData.user : null;
@@ -50,31 +51,46 @@ function CheckLogin({ children }) {
   return React.cloneElement(children, { currentUser });
 }
 
+function CheckSubscription({ children }) {
+  const storedData = JSON.parse(localStorage.getItem('user'));
+  const currentUser = storedData ? storedData.user : null;
+  const isSubscribed = currentUser ? currentUser.is_sub : false;
+
+  if (!currentUser) {
+    return <Navigate to="/login" />;
+  }
+
+  if (!isSubscribed) {
+    return <Navigate to="/Subscribe" />;
+  }
+
+  return React.cloneElement(children, { currentUser });
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/detail/:courseId" element={<Detail />} /> {/* update this line */}
+        <Route path="/detail/:courseId" element={<Detail />} /> 
         <Route path="/home" element={<Home />} />
-        <Route path="/Subscribe" element={<Subscribe />} />
+        <Route path="/Subscribe" element={<CheckLogin><Subscribe /></CheckLogin>} />
         <Route path="/homeuser" element={<CheckLogin><HomeUser /></CheckLogin>} />
         <Route path="/login" element={<CheckNotLogin><Login /></CheckNotLogin>} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/success" element={<Success />} />
+        <Route path="/success" element={<CheckLogin><Success /></CheckLogin>} />
         <Route path="/register" element={<CheckNotLogin><Register /></CheckNotLogin>} />
-        <Route path="/categories/:categoryId" element={<CategoryCourses />} /> {/* add this line */}
+        <Route path="/categories/:categoryId" element={<CategoryCourses />} /> 
         <Route path="/code-editor" element={<CodeEditor />} />
-        <Route path="/teacher" element={<Teacherhome />} />
-        <Route path="/CourseManager" element={<ManageCourses />} />
-        <Route path="/StudentManager" element={<ManageStudents />} />
+        <Route path="/teacher" element={<CheckLogin><Teacherhome /></CheckLogin>} />
+        <Route path="/CourseManager" element={<CheckLogin><ManageCourses /></CheckLogin>} />
+        <Route path="/StudentManager" element={<CheckLogin><ManageStudents /></CheckLogin>} />
+        <Route path="/NewCourse" element={<CheckLogin><NewCourse /></CheckLogin>} />
+        <Route path="/FirstStep/:courseId" element={<CheckSubscription><FirstStep /></CheckSubscription>} />
+        <Route path="/SecondStep/:courseId" element={<CheckSubscription><SecondStep /></CheckSubscription>} />
+        <Route path="/LastStep/:courseId" element={<CheckSubscription><LastStep /></CheckSubscription>} />
         <Route path="/NewCourse" element={<NewCourse />} />
-        <Route path="/FirstStep/:courseId" element={<FirstStep />} />
-        <Route path="/SecondStep/:courseId" element={<SecondStep />} />
-        <Route path="/LastStep/:courseId" element={<LastStep />} />
-        <Route path="/NewCourse" element={<NewCourse />} />
-        <Route path="/congratulations/:courseId" element={<Congratulations />} />
-                <Route path="*" element={<NotFound />} />
+        <Route path="/congratulations/:courseId" element={<CheckSubscription><Congratulations /></CheckSubscription>} />        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

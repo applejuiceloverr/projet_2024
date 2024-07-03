@@ -11,7 +11,6 @@ const LoginForm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if the user is already logged in
     axios.get("/account/")
       .then(function (res) {
         setCurrentUser(true);
@@ -27,14 +26,13 @@ const LoginForm = () => {
       let cookies = document.cookie.split(';');
       for (let i = 0; i < cookies.length; i++) {
         let cookie = cookies[i].trim();
-        // Does this cookie string begin with the name we want?
         if (cookie.substring(0, 10) === 'csrftoken=') {
           csrfToken = decodeURIComponent(cookie.substring(10));
           break;
         }
       }
     }
-    console.log(csrfToken); // Log the CSRF token to the console
+    console.log(csrfToken); 
     return csrfToken;
   }
 
@@ -72,13 +70,17 @@ const LoginForm = () => {
         if (data.user.is_staff) {
           navigate('/teacher'); // Redirect to /teacherhome
         } else {
-          navigate('/homeuser'); // Redirect to /homeuser
+          navigate('/home'); // Redirect to /homeuser
         }
       })
       .catch((error) => {
         console.error('Error:', error);
       });
   }
+  const HandleRegister = () => {
+    navigate('/register');
+  };
+
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
@@ -97,7 +99,7 @@ const LoginForm = () => {
             Login
           </button>
         </div>
-        <p className="text-sm text-center text-gray-500">Don't have an account? <a href="#" className="text-[#00df9a] font-bold hover:underline">Register</a></p>
+        <p onClick={HandleRegister} className="text-sm text-center text-gray-500">Don't have an account? <a href="#" className="text-[#00df9a] font-bold hover:underline">Register</a></p>
         <p className="text-sm text-center text-gray-500"><a href="#" className="text-[#00df9a] font-bold hover:underline">Forgot password?</a></p>
       </form>
     </div>

@@ -5,7 +5,7 @@ from .views import (
     CategoryListCreateView, CategoryDetailView, 
     CourseListCreateView, CourseDetailView, 
     QuizViewSet, ElementViewSet, UploadQuizView,
-    CoursesByTeacherView, start_course, complete_course, QuizDetailView,submit_quiz, generate_certificate
+    CoursesByTeacherView, start_course, complete_course, QuizDetailView,submit_quiz, generate_certificate,StudentsInCoursesView
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -27,7 +27,8 @@ urlpatterns = [
     path('courses/<int:course_id>/upload-quiz/', UploadQuizView.as_view(), name='upload-quiz'),
     path('courses/<int:course_id>/start-course/', start_course, name='start-course'),
     path('courses/<int:course_id>/complete-course/', complete_course, name='complete-course'),
-    path('courses/<int:course_id>/quiz/', QuizDetailView.as_view(), name='quiz-detail'),  # Add this line
-    path('courses/<int:course_id>/submit-quiz/', submit_quiz, name='submit-quiz'),  # Add this line
+    path('courses/<int:course_id>/quiz/', QuizDetailView.as_view(), name='quiz-detail'),  
+    path('courses/<int:course_id>/submit-quiz/', submit_quiz, name='submit-quiz'),  
     path('courses/<int:course_id>/generate-certificate/', generate_certificate, name='generate-certificate'),
+    path('students-in-courses/<int:teacher_id>/', StudentsInCoursesView.as_view(), name='students-in-courses'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

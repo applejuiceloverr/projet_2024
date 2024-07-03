@@ -46,7 +46,7 @@ def complete_course(request, course_id):
     
     progress = get_object_or_404(UserCourseProgress, user=user, course=course)
     progress.passed = True
-    progress.completed_at = timezone.now()  # Set the completion time
+    progress.completed_at = timezone.now()  
     progress.save()
     
     return Response({"message": "Course marked as complete."}, status=status.HTTP_200_OK)
@@ -68,7 +68,7 @@ class CourseViewSet(viewsets.ModelViewSet):
                 self.process_quiz_file(quiz_file, course)
             except Exception as e:
                 print(f"Error processing quiz file: {e}")
-                course.delete()  # Rollback course creation if quiz processing fails
+                course.delete()  
                 raise ValueError(f"Error creating course: {e}")
 
     def process_quiz_file(self, quiz_file, course):
@@ -137,7 +137,7 @@ class CourseListCreateView(generics.ListCreateAPIView):
                 self.process_quiz_file(quiz_file, course)
             except Exception as e:
                 print(f"Error processing quiz file: {e}")
-                course.delete()  # Rollback course creation if quiz processing fails
+                course.delete()  
                 raise ValueError(f"Error creating course: {e}")
 
     def process_quiz_file(self, quiz_file, course):
@@ -174,8 +174,18 @@ class CoursesByTeacherView(APIView):
     def get(self, request, teacher_id):
         teacher = get_object_or_404(User, id=teacher_id)
         courses = Course.objects.filter(created_by=teacher)
-        serializer = CourseSerializer(courses, many=True, context={'request': request})
-        return Response(serializer.data)
+
+        response_data = []
+        for course in courses:
+            number_of_students = UserCourseProgress.objects.filter(course=course).count()
+            successful_students = UserCourseProgress.objects.filter(course=course, passed=True).count()
+
+            course_data = CourseSerializer(course).data
+            course_data['number_of_students'] = number_of_students
+            course_data['successful_students'] = successful_students
+            response_data.append(course_data)
+
+        return Response(response_data)
 
 @permission_classes([AllowAny])
 class QuizViewSet(viewsets.ModelViewSet):
@@ -294,8 +304,8 @@ def generate_certificate_function(user, course):
 
     elements = []
 
-    # Corrected Logo Path
-    logo_path = f'{settings.MEDIA_ROOT}/certificates/invader.png'  # Ensure you have a logo.png file in your media/certificates directory
+    
+    logo_path = f'{settings.MEDIA_ROOT}/certificates/invader.png' 
     try:
         elements.append(Image(logo_path, width=2*inch, height=2*inch))
     except Exception as e:
@@ -346,3 +356,23 @@ def generate_certificate(request, course_id):
         "message": "Certificate generated successfully",
         "certificate_url": certification.certificate_file.url
     })
+
+
+@permission_classes([AllowAny])
+class StudentsInCoursesView(APIView):
+    def get(self, request, teacher_id):
+        teacher = get_object_or_404(User, id=teacher_id)
+        courses = Course.objects.filter(created_by=teacher)
+        students_progress = UserCourseProgress.objects.filter(course__in=courses).select_related('user', 'course')
+        
+        response_data = []
+        for progress in students_progress:
+            progress_data = {
+                'first_name': progress.user.prenom,
+                'last_name': progress.user.nom,
+                'course': progress.course.title,
+                'passed': progress.passed
+            }
+            response_data.append(progress_data)
+        
+        return Response(response_data)

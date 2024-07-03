@@ -62,8 +62,8 @@ const CoursesTable = () => {
                   <td className="p-2"></td>
                   <td className="p-2">{course.title}</td>
                   <td className="p-2">{course.category_detail.name}</td>
-                  <td className="p-2"></td>
-                  <td className="p-2"></td>
+                  <td className="p-2">{course.number_of_students}</td>
+                  <td className="p-2">{course.successful_students}</td>
                   <td className="p-2">
                     <button 
                       className="delete-btn text-red-500 hover:text-red-700"

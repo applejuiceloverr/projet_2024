@@ -1,8 +1,15 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
 
 const LearnMenu = () => {
     const { courseId } = useParams();
+    const navigate = useNavigate();
+
+    const handleExit = () => {
+        navigate('/Home');
+    };
 
     return (
         <div className="fixed left-0 top-0 h-full bg-black text-white w-64">
@@ -31,7 +38,7 @@ const LearnMenu = () => {
                         <li className="p-2 hover:bg-gray-700">
                             <Link to="/" className="flex items-center">
                                 <i className="fa fa-question-circle mr-3" aria-hidden="true"></i>
-                                <span className="text">Exit</span>
+                                <span Onclick ={handleExit} className="text">Exit</span>
                             </Link>
                         </li>
                     </ul>

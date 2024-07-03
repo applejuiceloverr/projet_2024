@@ -5,7 +5,7 @@ from .models import Account
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ['id', 'email', 'nom', 'prenom', 'password','username','is_staff',]
+        fields = ['id', 'email', 'nom', 'prenom', 'password','username','is_staff','is_sub']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -13,7 +13,7 @@ class AccountSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop('password')
         user = Account(**validated_data)
-        user.username = validated_data.get('email')  # Set username to email
+        user.username = validated_data.get('email')  
         user.set_password(password)
         user.save()
         return user

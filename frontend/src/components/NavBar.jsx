@@ -38,12 +38,17 @@ const Navbar = () => {
     }
   };
 
+  const handleLogin = () => {
+    navigate('/login');
+  };
+  const handleSubscribe = () => {
+    navigate('/Subscribe');};
+
   return (
     <div className='flex justify-between items-center h-24 max-w-[1240px] mx-auto px-4 text-white'>
-      <h1 className=' text-3xl font-bold text-[#00df9a]'>TEST.</h1>
+      <h1 className=' text-3xl font-bold text-[#00df9a]'>CyberClassroom</h1>
       <ul className='hidden md:flex'>
         <li className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Home</li>
-        <li className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>About</li>
         <li className='relative group p-4 hover:text-[#00df9a] transition duration-500 ease-in-out' onClick={handleDropdown}>
           <div className='flex justify-between items-center'>
             Categories
@@ -54,18 +59,20 @@ const Navbar = () => {
           {dropdown && (
             <div className='absolute left-0 w-[200px] mt-2 py-2 bg-gray-800 text-white rounded-lg shadow-xl'>
               <ul className='py-2 text-sm text-gray-700 dark:text-gray-400' aria-labelledby='dropdownLargeButton'>
-                <li className='px-4 py-2 hover:bg-gray-700'>Web Development</li>
-                <li className='px-4 py-2 hover:bg-gray-700'>Database Management</li>
-                <li className='px-4 py-2 hover:bg-gray-700'>Cloud Services</li>
               </ul>
             </div>
           )}
         </li>
         <li className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Contact</li>
         {loggedIn ? (
+          <li onClick={handleSubscribe} className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Subscribe</li>
+        ) : (
+          <li  className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>About</li>
+        )}
+        {loggedIn ? (
           <li onClick={logout} className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Logout</li>
         ) : (
-          <li className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Login</li>
+          <li onClick={handleLogin} className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Login</li>
         )}
       </ul>
       <div onClick={handleNav} className='block md:hidden'>
@@ -77,19 +84,12 @@ const Navbar = () => {
         <li className='p-4 border-b border-gray-600 hover:text-[#00df9a] transition duration-500 ease-in-out'>About</li>
         <li className='relative group p-4 border-b border-gray-600 hover:text-[#00df9a] transition duration-500 ease-in-out' onClick={handleDropdown}>
           Categories
-          {dropdown && (
-            <ul className='absolute left-0 w-full mt-2 py-2 bg-gray-800 text-white rounded-lg shadow-xl'>
-              <li className='px-4 py-2 hover:bg-gray-700'>Web Development</li>
-              <li className='px-4 py-2 hover:bg-gray-700'>Database Management</li>
-              <li className='px-4 py-2 hover:bg-gray-700'>Cloud Services</li>
-            </ul>
-          )}
         </li>
         <li className='p-4 border-b border-gray-600 hover:text-[#00df9a] transition duration-500 ease-in-out'>Contact</li>
         {loggedIn ? (
           <li onClick={logout} className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Logout</li>
         ) : (
-          <li className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Login</li>
+          <li onClick={handleLogin} className='p-4 hover:text-[#00df9a] transition duration-500 ease-in-out'>Login</li>
         )}
       </ul>
     </div>

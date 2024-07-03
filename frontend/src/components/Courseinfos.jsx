@@ -52,7 +52,7 @@ const Courseinfos = () => {
             return response.json();
         })
         .then(data => {
-            navigate(`/FirstStep/${courseId}`); // Redirect to /FirstStep/{courseId}
+            navigate(`/FirstStep/${courseId}`); 
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation: ', error);
@@ -62,32 +62,27 @@ const Courseinfos = () => {
     if (!course) return <p className="text-center text-gray-700">Loading...</p>;
 
     return (
-        <div className="px-2 py-10 w-full flex justify-center">
-            <div className="bg-white mx-4 lg:mx-8 flex flex-col lg:flex-row max-w-5xl shadow-lg rounded-lg overflow-hidden">
-                <div className="lg:w-1/2 h-64 lg:h-auto">
-                    <div 
-                        className="h-full bg-cover bg-center"
-                        style={{ backgroundImage: `url(${course.image})` }}
-                    ></div>
-                </div>
-                <div className="py-8 px-6 lg:px-12 max-w-xl lg:max-w-5xl lg:w-1/2">
-                    <h2 className="text-3xl text-gray-800 font-bold mb-4">
-                        {course.title}
-                        <span className="text-[#00df9a]"> Course</span>
-                    </h2>
-                    <p className="mt-4 text-gray-600 whitespace-pre-line break-words">
-                        {course.description}
-                    </p>
-                    <p className="mt-4 text-gray-600">
-                        <strong>Difficulty:</strong> {course.difficulty}
-                    </p>
-                    <div className="mt-8">
-                        <button
-                            onClick={handleStartNow}
-                            className="bg-gray-900 text-gray-100 px-5 py-3 font-semibold rounded hover:bg-gray-700 transition duration-300"
-                        >
-                            Start Now
-                        </button>
+        <div className="flex justify-center py-10">
+            <div className="bg-white shadow-lg rounded-lg overflow-hidden max-w-4xl w-full">
+                <div className="md:flex">
+                    <div className="md:flex-shrink-0">
+                        <img 
+                            src={course.image} 
+                            alt={course.title} 
+                            className="w-full h-64 object-cover md:h-full md:w-80" 
+                        />
+                    </div>
+                    <div className="p-8">
+                    <div className="text-lg md:text-xl lg:text-2xl uppercase tracking-wide text-[#00df9a] font-bold">{course.title} Course</div>                        <p className="mt-2 text-gray-600">{course.description}</p>
+                        <p className="mt-4 text-gray-600"><strong>Difficulty:</strong> {course.difficulty}</p>
+                        <div className="mt-6">
+                            <button
+                                onClick={handleStartNow}
+                                className="bg-[#00df9a] text-white px-5 py-3 font-semibold rounded hover:bg-green-600 transition duration-300"
+                            >
+                                Start Now
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

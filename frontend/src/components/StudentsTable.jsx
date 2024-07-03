@@ -1,7 +1,26 @@
-import React from 'react';
-import { FaUserPlus, FaTrash, FaEdit,FaBookOpen } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
 
 const StudentsTable = () => {
+  const [students, setStudents] = useState([]);
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const teacherId = userData?.user?.id;
+
+  useEffect(() => {
+    if (!teacherId) return;
+
+    axios.get(`http://127.0.0.1:8000/courses/students-in-courses/${teacherId}/`)
+      .then(response => {
+        setStudents(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching students:', error);
+      });
+  }, [teacherId]);
+
+
+
   return (
     <div className="main-section p-4">
       <div className="table-wrapper">
@@ -19,22 +38,30 @@ const StudentsTable = () => {
                 <th className="p-2">Last Name</th>
                 <th className="p-2">Course</th>
                 <th className="p-2">State</th>
-                <th className="p-2">Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="hover:bg-gray-100">
-                <td className="p-2"></td>
-                <td className="p-2"></td>
-                <td className="p-2"></td>
-                <td className="p-2"></td>
-                <td className="p-2"></td>
-                <td className="p-2">
-                <button className="delete-btn text-red-500 hover:text-red-700">
-                      <FaTrash title="Delete" />
-                    </button>
-                </td>
-              </tr>
+              {students.map((student, index) => (
+                <tr key={index} className="hover:bg-gray-100">
+                  <td className="p-2"></td>
+                  <td className="p-2">{student.first_name}</td>
+                  <td className="p-2">{student.last_name}</td>
+                  <td className="p-2">{student.course}</td>
+                  <td className="p-2">
+                    {student.passed ? <FaCheck className="text-green-500" /> : <FaTimes className="text-red-500" />}
+                  </td>
+                  <td className="p-2">
+
+                  </td>
+                </tr>
+              ))}
+              {students.length === 0 && (
+                <tr>
+                  <td className="p-2 text-center" colSpan="6">
+                    No students found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

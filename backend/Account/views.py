@@ -41,11 +41,11 @@ class LoginView(APIView):
             user = serializer.check_user(data)
             login(request, user)
             
-            # Generate JWT tokens
+            
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
             
-            # Serialize the user data including 'nom' and 'prenom'
+            
             user_data = AccountSerializer(user).data
             
             return Response({
@@ -86,8 +86,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        # Read permissions are allowed to any request,
-        # so we'll always allow GET, HEAD, or OPTIONS requests.
+
         if request.method in permissions.SAFE_METHODS:
             return True
 

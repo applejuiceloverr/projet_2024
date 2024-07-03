@@ -5,12 +5,12 @@ import { AiFillGithub, AiOutlineArrowRight } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
 const categories = [
-    { id: 6, name: 'Cloud', icon: <DiOnedrive /> },
-    { id: 2, name: 'Linux', icon: <DiLinux /> },
-    { id: 3, name: 'Web Dev', icon: <DiHtml5 /> },
-    { id: 4, name: 'Coding', icon: <DiCodeBadge /> },
+    { id: 4, name: 'Cloud', icon: <DiOnedrive /> },
+    { id: 3, name: 'Linux', icon: <DiLinux /> },
+    { id: 1, name: 'Web Dev', icon: <DiHtml5 /> },
+    { id: 2, name: 'Coding', icon: <DiCodeBadge /> },
     { id: 5, name: 'Database', icon: <DiDatabase /> },
-    { id: 1, name: 'Devops', icon: <AiFillGithub /> },
+    { id: 6, name: 'Devops', icon: <AiFillGithub /> },
 ];
 
 const CategoryCard = ({ id, name, icon }) => {

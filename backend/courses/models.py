@@ -58,7 +58,7 @@ class UserCourseProgress(models.Model):
     course = models.ForeignKey(Course, related_name='progress', on_delete=models.CASCADE)
     quiz_score = models.FloatField(null=True, blank=True)
     passed = models.BooleanField(default=False)
-    completed_at = models.DateTimeField(null=True, blank=True)  # Add this field
+    completed_at = models.DateTimeField(null=True, blank=True)  
 
     def __str__(self):
         return f"{self.user.username}'s progress in {self.course.title}"
