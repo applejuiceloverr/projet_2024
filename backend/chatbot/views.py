@@ -3,8 +3,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import openai
 import json
-
-openai.api_key = "sk-proj-JpepWLZcApyIo034yZVYT3BlbkFJeKWlpShxB7oV2kSwSWzM"
+from django.conf import settings  
+openai.api_key = settings.OPENAI_API_KEY
 
 def chat(prompt):
     try:
